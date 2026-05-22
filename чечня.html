@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чеченская Республика | Экспедиция в Сердце Кавказа</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.65);
+            --accent: #2ecc71; /* Благородный зеленый */
+            --accent-glow: rgba(46, 204, 113, 0.3);
+            --accent-blue: #3498db;
+            --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            font-family: var(--font-display);
+            background-color: #020202;
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth; /* Плавный переход при клике на вкладки */
+        }
+
+        /* ================= АНИМИРОВАННЫЙ ФОН AURORA ================= */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: #020202;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.55;
+            animation: float 25s infinite alternate ease-in-out;
+            will-change: transform;
+        }
+
+        /* Цветовые пятна */
+        .orb-1 { width: 75vw; height: 75vw; background: #003a1f; top: -25%; left: -15%; } /* Темный изумруд */
+        .orb-2 { width: 65vw; height: 65vw; background: #0a142c; bottom: -20%; right: -10%; animation-delay: -5s; } /* Синяя глубина */
+        .orb-3 { width: 55vw; height: 55vw; background: #163a2a; top: 35%; left: 45%; transform: translate(-50%, -50%); animation-delay: -10s; } /* Хвоя */
+        .orb-4 { width: 45vw; height: 45vw; background: #1f0b2a; top: 15%; right: 15%; animation-delay: -15s; } /* Фиолетовая дымка */
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33% { transform: translate(8vw, 12vh) scale(1.15) rotate(15deg); }
+            66% { transform: translate(-8vw, 6vh) scale(0.9) rotate(-15deg); }
+            100% { transform: translate(-12vw, -12vh) scale(1.05) rotate(10deg); }
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+            opacity: 0.035;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ================= НАВИГАЦИОННАЯ ПАНЕЛЬ ================= */
+        nav {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 4px;
+            padding: 6px;
+            background: rgba(18, 18, 18, 0.55);
+            backdrop-filter: blur(45px) saturate(210%);
+            -webkit-backdrop-filter: blur(45px) saturate(210%);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 var(--glass-highlight);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-item {
+            padding: 10px 22px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .nav-item.active {
+            color: #000000;
+            background: #ffffff;
+            box-shadow: 0 4px 18px rgba(255,255,255,0.35);
+            font-weight: 600;
+        }
+
+        /* ================= ОБЩАЯ СТРУКТУРА СТРАНИЦЫ ================= */
+        main {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        section {
+            width: 100%;
+            min-height: 100vh;
+            padding: 140px 6% 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ================= ТЕХНОЛОГИЯ LIQUID GLASS UI ================= */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(55px) saturate(160%);
+            -webkit-backdrop-filter: blur(55px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            border-radius: 36px;
+            padding: 70px 60px;
+            width: 100%;
+            max-width: 1240px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.12);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 50px;
+        }
+
+        .interactive-glass::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(750px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.09), transparent 45%);
+            z-index: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .interactive-glass:hover::before {
+            opacity: 1;
+        }
+
+        .content-z {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ================= ТИПОГРАФИКА И СЕТКА ================= */
+        h1 {
+            font-size: clamp(3.2rem, 8vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 28px;
+            background: linear-gradient(135deg, #ffffff 10%, rgba(255,255,255,0.45) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: clamp(2.4rem, 5vw, 3.8rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #ffffff 30%, rgba(255,255,255,0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 650;
+            margin-bottom: 14px;
+            letter-spacing: -0.01em;
+        }
+
+        h4 {
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: clamp(1.1rem, 1.4vw, 1.25rem);
+            color: var(--text-muted);
+            line-height: 1.65;
+            max-width: 850px;
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
+
+        .text-center {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Сетка карточек */
+        .grid-auto {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1240px;
+        }
+
+        .card {
+            background: rgba(18, 18, 18, 0.45);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 45px 35px;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 480px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 40px 70px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .card p {
+            font-size: 1.05rem;
+            margin-bottom: 0;
+            z-index: 2;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.5;
+        }
+
+        .bg-img {
+            background-size: cover !important;
+            background-position: center !important;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.92) 100%);
+            z-index: 1;
+        }
+
+        /* ================= ДЕТАЛИ И КНОПКИ ================= */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 44px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 500;
+            text-decoration: none;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 20px 40px rgba(255,255,255,0.25);
+        }
+
+        .badge {
+            background: rgba(46, 204, 113, 0.15);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            margin-bottom: 20px;
+            z-index: 2;
+            width: fit-content;
+        }
+
+        .gov-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 26px 32px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 18px;
+            width: 100%;
+        }
+
+        .gov-link:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.25);
+            transform: translateX(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .gov-link span {
+            font-weight: 650;
+            font-size: 1.25rem;
+            letter-spacing: -0.01em;
+        }
+
+        .gov-link small {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* ================= АНИМАЦИИ ПРИ СКРОЛЛЕ ================= */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(70px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #020202; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 10px; border: 2px solid #020202; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
+
+        /* Адаптивность для мобильных девайсов */
+        @media (max-width: 900px) {
+            nav {
+                width: 95%;
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding: 6px;
+                top: 15px;
+            }
+            .nav-item { padding: 10px 16px; font-size: 13px; }
+            section { padding: 110px 4% 60px; }
+            .glass-panel { padding: 45px 25px; border-radius: 28px; }
+            .card { min-height: 380px; padding: 35px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Анимированный интерактивный фон -->
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+    <div class="noise-overlay"></div>
+
+    <!-- Навигационная панель (Вкладки) -->
+    <nav id="navbar">
+        <a href="#home" class="nav-item active">Главная</a>
+        <a href="#grozny" class="nav-item">Грозный</a>
+        <a href="#nature" class="nav-item">Природа</a>
+        <a href="#culture" class="nav-item">Культура</a>
+        <a href="#projects" class="nav-item">Инвестиции</a>
+        <a href="#guide" class="nav-item">Гид туриста</a>
+        <a href="#info" class="nav-item">Справочная</a>
+    </nav>
+
+    <main>
+        <!-- РАЗДЕЛ 1: ГЛАВНАЯ (ОБЗОР) -->
+        <section id="home">
+            <div class="glass-panel interactive-glass text-center fade-up">
+                <div class="content-z">
+                    <h4>Территория Открытий</h4>
+                    <h1>Сердце Кавказа</h1>
+                    <p>Чеченская Республика — земля величественных башен, кристально чистых высокогорных озер и ультрасовременного футуризма. Здесь древнейшая культура предков гармонично сосуществует с технологическими инновациями. Регион с безупречной репутацией безопасности, развитой инфраструктурой и легендарным кавказским гостеприимством готов открыть свои двери для искушенного путешественника.</p>
+                    <a href="#grozny" class="btn">Исследовать мир ЧР</a>
+                </div>
+            </div>
+            
+            <div class="grid-auto">
+                <div class="card interactive-glass fade-up delay-1" style="background: rgba(30,30,30,0.5);">
+                    <div class="content-z">
+                        <span class="badge">Статистика</span>
+                        <h3 style="font-size: 3.5rem; margin-bottom: 5px; color: var(--accent); font-weight: 800;">1.5M+</h3>
+                        <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px;">Жителей республики создают уникальный социокультурный пласт региона.</p>
+                        <h3 style="font-size: 3.5rem; margin-bottom: 5px; color: #ffffff; font-weight: 800;">#1</h3>
+                        <p style="color: var(--text-muted); font-size: 1.1rem;">Официально признанный самый безопасный регион Российской Федерации.</p>
+                    </div>
+                </div>
+                <a href="#grozny" class="card bg-img interactive-glass fade-up delay-2" style="background: url('https://grozmer.ru/images/content/5b99ae569ffa6f24b798c2fdf06e2a83.jpg?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Инфраструктура</span>
+                        <h3>Архитектура Будущего</h3>
+                        <p>Грозный — мегаполис с широкими проспектами, опережающий время в градостроительном дизайне.</p>
+                    </div>
+                </a>
+                <a href="#nature" class="card bg-img interactive-glass fade-up delay-3" style="background: url('https://trip-kavkaz.com/images/checnya/d17ff072019c4e819c4da2e6ef5bcff1.jpeg?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Экология</span>
+                        <h3>Величие Природы</h3>
+                        <p>Уникальные заповедные экосистемы, древнейшие ледники и альпийское сияние бирюзовых озер.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 2: ГРОЗНЫЙ (УРБАНИСТИКА И ФУТУРИЗМ) -->
+        <section id="grozny">
+            <div class="glass-panel interactive-glass fade-up">
+                <div class="content-z">
+                    <h4>Инновации и Дизайн</h4>
+                    <h2>Грозный: Мегаполис XXI века</h2>
+                    <p>Практически полностью разрушенный в конце XX века, Грозный совершил беспрецедентный в современной истории скачок. Сегодня это сияющий, чистый город, устремленный в будущее. Роскошные небоскребы, умные технологии управления городской средой, цветущие сады и невероятное ночное световое шоу создают облик роскошного инновационного мегаполиса.</p>
+                </div>
+            </div>
+
+            <div class="grid-auto">
+                <div class="card bg-img interactive-glass fade-up delay-1" style="background: url('https://images.unsplash.com/photo-1543888365-1d428989c926?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Архитектура</span>
+                        <h3>Мечеть «Сердце Чечни»</h3>
+                        <p>Построенная в классическом османском стиле, она облицована редчайшим травертином из Турции. Стены расписаны чистым золотом высшей пробы, а 36 люстр украшены кристаллами Swarovski.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-2" style="background: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Высотные здания</span>
+                        <h3>Грозный-Сити</h3>
+                        <p>Суперсовременный комплекс небоскребов на берегу Сунжи, включающий отель пяти звезд, бизнес-центры, жилые башни и панорамную смотровую площадку на крыше здания «Феникс».</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-3" style="background: url('https://images.unsplash.com/photo-1519999482648-25049ddd37b1?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Рекреация</span>
+                        <h3>Цветочный Парк Грозного</h3>
+                        <p>Уникальный оазис у подножия небоскребов, раскинувшийся на площади более 45 000 кв.м. Здесь высажено более 150 000 живых цветов, оформленных в арки-сердца и цветочные фонтаны.</p>
+                    </div>
+                </div>
+                <div class="card interactive-glass fade-up delay-4" style="background: rgba(30,30,30,0.5);">
+                    <div class="content-z" style="height: 100%; display: flex; flex-direction: column;">
+                        <span class="badge">Будущее</span>
+                        <h3>Ахмат Тауэр (В Проекте)</h3>
+                        <p style="color: var(--text-muted); margin-bottom: auto;">Уникальный проект сверхвысокого небоскреба высотой 435 метров (102 этажа). Дизайн разработан архитекторами Burj Khalifa и символизирует древнюю чеченскую средневековую башню в высокотехнологичном исполнении.</p>
+                        <div style="padding-top: 25px;">
+                            <span style="font-size: 2.8rem; font-weight: 800; color: #ffffff;">435 м</span>
+                            <span style="font-size: 1rem; color: var(--text-muted); display: block;">Планируемая высота монументального строения</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 3: ПРИРОДА (ЗАПОВЕДНЫЕ КРАЯ И ЧУДЕСА) -->
+        <section id="nature">
+            <div class="glass-panel interactive-glass fade-up">
+                <div class="content-z">
+                    <h4>География и Заповедники</h4>
+                    <h2>Великолепие Дикого Кавказа</h2>
+                    <p>Территория республики охватывает несколько климатических зон — от знойных песчаных полупустынь на севере до вечных ледников на высотах более 4000 метров на юге. Горы Чечни скрывают в себе чистейшие реки, карстовые пещеры и памятники древней каменной архитектуры, идеально вписанные в дикие скальные ландшафты.</p>
+                </div>
+            </div>
+
+            <div class="grid-auto">
+                <div class="card bg-img interactive-glass fade-up delay-1" style="background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Гидрология</span>
+                        <h3>Озеро Кезеной-Ам</h3>
+                        <p>Высокогорная жемчужина на границе с Дагестаном (1869 м над уровнем моря). Вода обладает поразительным бирюзовым цветом и меняет оттенок в зависимости от погоды. В озере обитает эндемичная эйзенамская форель.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-2" style="background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">История & Скалы</span>
+                        <h3>Аргунское ущелье</h3>
+                        <p>Один из самых величественных и протяженных каньонов на Кавказе. На протяжении веков ущелье служило неприступным природным щитом, контролирующим караванные пути из Азии в Европу.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-3" style="background: url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Архитектурный памятник</span>
+                        <h3>Ушкалойские башни</h3>
+                        <p>Две башни-близнецы XI-XII веков, виртуозно встроенные под козырек отвесной скалы в самом узком месте ущелья реки Чанты-Аргун. Служили таможенным и оборонительным постом.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-4" style="background: url('https://images.unsplash.com/photo-1520208422220-d12a3c588e6c?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Спорт & Активности</span>
+                        <h3>Курорт Ведучи</h3>
+                        <p>Высокогорный всесезонный курорт. Обладает современной канатной дорогой, уникальными сухими горнолыжными трассами для катания даже летом и развитой инфраструктурой шале.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 4: КУЛЬТУРА (КОДЕКС И ГАСТРОНОМИЯ) -->
+        <section id="culture">
+            <div class="glass-panel interactive-glass fade-up">
+                <div class="content-z">
+                    <h4>Душа и наследие предков</h4>
+                    <h2>Традиции, Кодекс и Вкус</h2>
+                    <p>В основе чеченской идентичности лежит непоколебимый кодекс благородства и гостеприимства. Чеченцы бережно сохраняют фольклор, ремесла и древнюю кулинарию. Уважение к старшим здесь возведено в абсолютный закон жизни, а каждый путник считается почетным гостем, которому отдают лучшее в доме.</p>
+                </div>
+            </div>
+
+            <div class="grid-auto">
+                <div class="card interactive-glass fade-up delay-1" style="background: rgba(46, 204, 113, 0.1);">
+                    <div class="content-z">
+                        <span class="badge">Этика</span>
+                        <h3>Кодекс Чести «Нохчалла»</h3>
+                        <p style="color: #ffffff; font-size: 1.15rem; line-height: 1.6;">Это неписаный закон благородного поведения. Он требует от чеченца быть мягким в общении, но твердым, как кремень, в защите своей чести и свободы, проявлять глубокое уважение к любой женщине и никогда не демонстрировать превосходство над другими людьми.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-2" style="background: url('https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Кухня</span>
+                        <h3>Жижиг-Галнаш</h3>
+                        <p>Кулинарная визитная карточка. Традиционное блюдо из свежего отварного мяса (баранина, говядина или сушеное мясо) и домашних пшеничных или кукурузных галушек. Подается с наваристым бульоном и пикантным чесночным соусом.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-3" style="background: url('https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Выпечка</span>
+                        <h3>Чепалгаш и Хингалш</h3>
+                        <p>Нежнейшие национальные лепешки. Чепалгаш готовят на сухой сковороде с начинкой из сочного домашнего творога со свежей зеленью, а Хингалш наполняют ароматным сладким тыквенным пюре и обильно сдабривают топленым маслом.</p>
+                    </div>
+                </div>
+                <div class="card bg-img interactive-glass fade-up delay-4" style="background: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1000');">
+                    <div class="bg-overlay"></div>
+                    <div class="content-z">
+                        <span class="badge">Искусство</span>
+                        <h3>Танец Воинов и Орлов</h3>
+                        <p>Чеченская лезгинка — экспрессивный диалог мужчины и женщины. Мужчина танцует в образе парящего горного орла на кончиках пальцев, демонстрируя силу и ловкость, а женщина плывет грациозно, словно лебедь.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 5: ИНВЕСТИЦИИ И БУДУЩЕЕ -->
+        <section id="projects">
+            <div class="glass-panel interactive-glass fade-up">
+                <div class="content-z">
+                    <h4>Индустрия и Прогресс</h4>
+                    <h2>Инвестиционный Бум ЧР</h2>
+                    <p>Чеченская Республика сегодня — динамичная площадка для крупного бизнеса, промышленности и стартапов. Здесь развернуты особые экономические зоны, строятся инновационные фабрики, развиваются зеленые агротехнологии и активно застраиваются масштабные жилые кварталы.</p>
+                </div>
+            </div>
+
+            <div class="grid-auto">
+                <div class="card interactive-glass fade-up delay-1" style="background: rgba(30, 30, 30, 0.4);">
+                    <div class="content-z">
+                        <span class="badge">Экономика</span>
+                        <h3>ОЭЗ «Ведучи»</h3>
+                        <p>Особая экономическая зона туристско-рекреационного типа, предоставляющая уникальные налоговые льготы, субсидии и землю для инвесторов, строящих туристическую инфраструктуру в горах ЧР.</p>
+                    </div>
+                </div>
+                <div class="card interactive-glass fade-up delay-2" style="background: rgba(52, 152, 219, 0.1);">
+                    <div class="content-z">
+                        <span class="badge">Урбанизм</span>
+                        <h3>Новый район им. Путина</h3>
+                        <p>Гигантский современный жилой мегапроект в Грозном, застраиваемый умными многоэтажными жилыми комплексами, школами, парками и современными бизнес-инкубаторами по последнему слову техники.</p>
+                    </div>
+                </div>
+                <div class="card interactive-glass fade-up delay-3" style="background: rgba(230, 126, 34, 0.1);">
+                    <div class="content-z">
+                        <span class="badge">Агропром</span>
+                        <h3>Сады Чечни</h3>
+                        <p>Масштабные современные сады интенсивного типа, использующие системы капельного орошения и умного мониторинга почвы для экспорта экологически чистых фруктов премиального качества.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 6: ПРАКТИЧЕСКИЙ ГИД ТУРИСТА -->
+        <section id="guide">
+            <div class="glass-panel interactive-glass fade-up">
+                <div class="content-z">
+                    <h4>Полезно знать</h4>
+                    <h2>Практическое руководство для путешественника</h2>
+                    <p>Чтобы ваше пребывание на чеченской земле было максимально комфортным, безопасным и наполненным теплыми воспоминаниями, мы подготовили краткий гид по культуре поведения, логистике и местному этикету.</p>
+                </div>
+            </div>
+
+            <div class="grid-auto">
+                <div class="card interactive-glass fade-up delay-1" style="background: rgba(20, 20, 20, 0.55);">
+                    <div class="content-z">
+                        <span class="badge">Логистика</span>
+                        <h3>Как добраться?</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">Международный аэропорт Грозный им. А.А. Кадырова ежедневно принимает рейсы из Москвы, Санкт-Петербурга, Казани, Дубая, Стамбула и других городов. Также отлично развито железнодорожное сообщение и федеральная автотрасса «Кавказ».</p>
+                    </div>
+                </div>
+                <div class="card interactive-glass fade-up delay-2" style="background: rgba(20, 20, 20, 0.55);">
+                    <div class="content-z">
+                        <span class="badge">Культура</span>
+                        <h3>Дресс-код и Этикет</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">Чечня — регион строгих традиций. Мужчинам не принято носить шорты и майки без рукавов. Женщинам рекомендуется выбирать закрытую одежду ниже колен без глубоких декольте, а при посещении мечетей — покрывать голову платком.</p>
+                    </div>
+                </div>
+                <div class="card interactive-glass fade-up delay-3" style="background: rgba(20, 20, 20, 0.55);">
+                    <div class="content-z">
+                        <span class="badge">Безопасность</span>
+                        <h3>Безопасность 100%</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">Вы можете спокойно гулять по ночному Грозному. Уровень уличной преступности здесь сведен практически к нулю. На улицах дежурит вежливая туристическая полиция, всегда готовая прийти на помощь и подсказать дорогу.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 7: СПРАВОЧНАЯ (ОФИЦИАЛЬНЫЕ САЙТЫ) -->
+        <section id="info">
+            <div class="glass-panel interactive-glass text-center fade-up">
+                <div class="content-z">
+                    <h4>Ресурсы</h4>
+                    <h2>Официальные государственные порталы</h2>
+                    <p>Используйте проверенные государственные и туристические источники для организации официальных визитов, планирования туров и изучения истории Чеченской Республики.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel interactive-glass fade-up delay-1" style="padding: 50px; width: 100%;">
+                <div class="content-z">
+                    <a href="https://chechnya.gov.ru/" target="_blank" class="gov-link">
+                        <div>
+                            <span>Глава и Правительство ЧР</span>
+                            <small>Официальные пресс-релизы, постановления и программы развития • chechnya.gov.ru</small>
+                        </div>
+                        <span style="font-size: 1.6rem;">↗</span>
+                    </a>
+                    <a href="https://grozmer.ru/" target="_blank" class="gov-link">
+                        <div>
+                            <span>Мэрия города Грозного</span>
+                            <small>Официальный сайт администрации столицы, городские службы и новости • grozmer.ru</small>
+                        </div>
+                        <span style="font-size: 1.6rem;">↗</span>
+                    </a>
+                    <a href="https://visitchechnya.ru/" target="_blank" class="gov-link">
+                        <div>
+                            <span>Туристический портал Visit Chechnya</span>
+                            <small>Главный гид для путешественников: маршруты, гостиницы, гиды, бронирование • visitchechnya.ru</small>
+                        </div>
+                        <span style="font-size: 1.6rem;">↗</span>
+                    </a>
+                    <a href="https://chechen-museum.ru/" target="_blank" class="gov-link">
+                        <div>
+                            <span>Национальный музей Чеченской Республики</span>
+                            <small>Этнографические коллекции, древнее оружие, исторические артефакты • chechen-museum.ru</small>
+                        </div>
+                        <span style="font-size: 1.6rem;">↗</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ================= СКРИПТЫ СВЕЧЕНИЯ И SCROLL SPY =================
+
+        // 1. Интерактивная подсветка стеклянных панелей за движением курсора мыши (Spotlight Effect)
+        function updateSpotlight() {
+            document.querySelectorAll('.interactive-glass').forEach(el => {
+                el.addEventListener('mousemove', e => {
+                    const rect = el.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    el.style.setProperty('--mouse-x', `${x}px`);
+                    el.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+        }
+        updateSpotlight();
+
+        // 2. Умное переключение активных вкладок при скролле (ScrollSpy)
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                // Активация вкладки происходит, если мы прошли 35% высоты секции
+                if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 3. Плавная анимация появления контента при прокрутке страницы (Intersection Observer)
+        const observerOptions = {
+            threshold: 0.08,
+            rootMargin: "0px 0px -40px 0px"
+        };
+
+        const revealObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    // Раскомментируйте строчку ниже, если хотите, чтобы анимация срабатывала при каждом листании вверх/вниз
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
